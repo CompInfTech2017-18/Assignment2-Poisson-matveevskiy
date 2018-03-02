@@ -3,9 +3,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-import matplotlib.cm as cm
-import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
 import numpy as np
 
 pi = np.pi
@@ -42,7 +39,11 @@ class landscap:
        
     def run(self,meth):
         if meth == 'an':
-            U=self.an()
+            U = self.an()
+            self.plotter(U)
+            self.lines(U)
+        if meth == 'jac':
+            U = self.Jacoby()
             self.plotter(U)
             self.lines(U)
     
@@ -67,8 +68,20 @@ class landscap:
         for i in range(im):
             U += 4*V/pi*np.sinh(pi*(y)/a*(2*i + 1)) * np.sin((pi*x)/a*(2*i + 1)) /( (2*i+1) * np.sinh(pi*(2*i + 1)) )
         return U
+    
+    def Jacoby(self):
+        Unew = self.Uin
+        Unew[self.YY-1,:] = 100
+        n = 5000
+        for i in range(n):
+            Uold = Unew
+            Unew[1:self.XX-1,1:self.YY-1] =(Uold[0:-2,1:-1]+Uold[2:,1:-1]+Uold[1:-1,2:]+Uold[1:-1,0:-2])/4.0
+            Unew[self.YY-1,:] = 100
+        return Unew
+    
+    def Gauss(self):
+        return 0
         
-        
-        
-        
-a1 = landscap(100,100,'an')
+           
+a1 = landscap(100,100,'jac')
+a2 = landscap(100,100,'an')
