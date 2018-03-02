@@ -3,6 +3,9 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
+import matplotlib.cm as cm
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 import numpy as np
 
 pi = np.pi
@@ -18,7 +21,7 @@ class landscap:
         X=np.linspace(0,self.XX,self.XX)
         Y=np.linspace(0,self.YY,self.YY)
         self.xgrid, self.ygrid = np.meshgrid(X,Y)
-        self.ex(meth)
+        self.run(meth)
     
     def plotter(self,U):
         dx, dy = 1., 1.
@@ -26,7 +29,7 @@ class landscap:
                 slice(1, self.XX + dx, dx)]
         z = U
         
-        levels = MaxNLocator(nbins=100).tick_values(z.min(), z.max())
+        levels = MaxNLocator(nbins=100).tick_values(0.0, z.max())
         cmap = plt.get_cmap('PiYG')
         norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
 
@@ -34,23 +37,37 @@ class landscap:
 
         im = ax0.pcolormesh(x, y, z, cmap=cmap, norm=norm)
         fig.colorbar(im, ax=ax0)
+        
+    
        
-    def ex(self,meth):
+    def run(self,meth):
         if meth == 'an':
-            self.plotter(self.an())
+            U=self.an()
+            self.plotter(U)
+            self.lines(U)
+    
+    def lines(self, U):
+        dx, dy = 1., 1.
+        y, x = np.mgrid[slice(1, self.YY + dy, dy),
+                slice(1, self.XX + dx, dx)]
+        z = U
+        plt.figure()
+        CS = plt.contour(x, y, z, 5)
+        plt.clabel(CS, inline=1, fontsize=10)
+        
     
     def an(self):
         
         x=self.xgrid
         y=self.ygrid
         U = self.Uin
-        a = self.XX + 0.0
-        im = 100
-        V = 100.
+        a = self.XX
+        im = 99
+        V = 100
         for i in range(im):
-             U += np.sin(pi*(i+0.0)*x/a)*(np.sinh(pi*(i+0.0)*y/a))*16.0*V/(((2.0*(i+0.0)+1.0)*np.sinh((2.0*(i+0.0)+1.0)*pi)))
+            U += 4*V/pi*np.sinh(pi*(y)/a*(2*i + 1)) * np.sin((pi*x)/a*(2*i + 1)) /( (2*i+1) * np.sinh(pi*(2*i + 1)) )
         return U
-        np.c
+        
         
         
         
