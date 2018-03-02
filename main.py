@@ -9,7 +9,7 @@ pi = np.pi
 
 class landscap:
     def __init__(self,Ox,Oy,meth):
-        self.eps = 0.06
+        self.eps = 0.1
         self.XX=Ox
         self.YY=Oy
         'self.Uin = np.random.rand(Ox,Oy)'
@@ -50,6 +50,10 @@ class landscap:
             U = self.Gauss()
             self.plotter(U)
             self.lines(U)
+        if meth == 'relax':
+            U = self.Relax()
+            self.plotter(U)
+            self.lines(U)
     
     def lines(self, U):
         dx, dy = 1., 1.
@@ -76,13 +80,15 @@ class landscap:
     def Jacoby(self):
         Unew = self.Uin
         Unew[self.YY-1,:] = 100.0
-        n = 50000
+        n = 1000
         for i in range(n):
             Uold = Unew
             Uold1 = Unew[1:self.XX-1,1:self.YY-1]
+           
             Unew[1:self.XX-1,1:self.YY-1] =(Uold[0:-2,1:-1]+Uold[2:,1:-1]+Uold[1:-1,2:]+Uold[1:-1,0:-2])/4.0
-            
+           
             if np.abs(((np.trace(Unew))-(np.trace(Uold1)))/np.trace(Uold1)) < self.eps:
+                
                 break
             Unew[self.YY-1,:] = 100.0
         return Unew
@@ -90,16 +96,35 @@ class landscap:
     def Gauss(self):
         Unew = self.Uin
         Unew[self.YY-1,:] = 100.0
-        n = 50000
+        n = 1000
         for i in range(n):
             Uold1 = Unew[1:self.XX-1,1:self.YY-1]
             Unew[1:self.XX-1,1:self.YY-1] =(Unew[0:-2,1:-1]+Unew[2:,1:-1]+Unew[1:-1,2:]+Unew[1:-1,0:-2])/4.0
             
             if np.abs(((np.trace(Unew))-(np.trace(Uold1)))/np.trace(Uold1)) < self.eps:
+                
+                break
+            Unew[self.YY-1,:] = 100.0
+        return Unew
+    
+    def Relax(self):
+        Unew = self.Uin
+        Unew[self.YY-1,:] = 100.0
+        n = 2000
+        w = 20
+        for i in range(n):
+            Uold = Unew
+            Uold1 = Unew[1:self.XX-1,1:self.YY-1]
+            Unew[1:self.XX-1,1:self.YY-1] =(Unew[0:-2,1:-1]+Unew[2:,1:-1]+Unew[1:-1,2:]+Unew[1:-1,0:-2])/4.0
+            delta = Unew - Uold
+            Unew = Uold + delta*w
+            
+            if np.abs(((np.trace(Unew))-(np.trace(Uold1)))/np.trace(Uold1)) < self.eps:
+                print(i)
                 break
             Unew[self.YY-1,:] = 100.0
         return Unew
         
            
-a1 = landscap(100,100,'gauss')
+a1 = landscap(700,700,'relax')
 
